@@ -1,0 +1,54 @@
+openapi: 3.0.0
+servers:
+  - description: ローカル
+    url: https://localhost:8080/v1
+info:
+  description: ゲームの土台となる API です
+  version: "0.1.0"
+  title: Game Base API
+  contact:
+    email: syslink.h.inoue@gmail.com
+tags:
+  - name: table
+paths:
+  /tables:
+    post:
+      tags:
+        - table
+      summary: テーブルを作成する
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableResponse'
+  /tables/{tableId}:
+    post:
+      tags:
+        - table
+      summary: テーブルの情報を取得する
+      parameters:
+        - name: tableId
+          in: path
+          description: テーブル ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableResponse'
+
+components:
+  schemas:
+    TableResponse:
+      required:
+        - tableId
+      properties:
+        tableId:
+          description: テーブル ID
+          type: string
+          example: 550e8400-e29b-41d4-a716-446655440000
+      type: object
