@@ -17,7 +17,7 @@ paths:
         - table
       summary: テーブルを作成する
       responses:
-        '201':
+        201:
           content:
             application/json:
               schema:
@@ -35,20 +35,62 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        200:
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/TableResponse'
+  /tables/{tableId}/players:
+    post:
+      tags:
+        - table
+      summary: テーブルにプレイヤーが参加する
+      parameters:
+        - name: tableId
+          in: path
+          description: テーブル ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: プレイヤー名
+                  example: ino_h
+      responses:
+        201:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: アクセストークン
+                    example: 550e8400-e29b-41d4-a716-446655440000
 
 components:
   schemas:
     TableResponse:
       required:
-        - tableId
+        - id
       properties:
-        tableId:
-          description: テーブル ID
+        id:
           type: string
+          description: テーブル ID
           example: 550e8400-e29b-41d4-a716-446655440000
-      type: object
+        players:
+          description: プレイヤー一覧
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: プレイヤー名
+                example: ino_h
