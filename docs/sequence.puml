@@ -1,57 +1,45 @@
 @startuml nimmt
 
-actor User as user
+actor Player as user
+entity Table as table
 entity "Nimmt!" as nimmt
-entity Notice as notice
 
 autonumber "<b>[0]"
 
 == 準備フェーズ ==
 
-user -> nimmt: テーブルを作成する
-nimmt -->> notice: CreateTable
-nimmt -> nimmt: ステータス：TableCreated
-nimmt --> user: テーブル ID
+user -> table: テーブルを作成する
+activate table
 
-loop poling
-  user -> nimmt: テーブル情報を取得する
-  nimmt --> user: テーブル情報 (並んでいるカード, ステータス)
+table --> user: テーブル情報（table_id）
+deactivate table
 
-  ref over user
-    ステータスに従い処理
-  end ref
-end
+user -> nimmt: テーブルに参加する（table_id, name）
+activate nimmt
+nimmt -> table: プレイヤーを登録する（table_id, name）
+activate table
+table --> nimmt: プレイヤー情報（player_id, name）
+deactivate table
+nimmt -> nimmt: カードとプレイヤーを紐づける
+nimmt --> user: JWT（プレイヤー情報）
+deactivate nimmt
 
-loop プレイヤー数
-  user -> nimmt: 参加する (テーブル ID)
-  nimmt -->> notice: JoinPlayer
-  nimmt --> user: アクセストークン（テーブル ID、手札カード）
-end
+user -> nimmt: テーブル情報を取得する（JWT）
+activate nimmt
+nimmt -> table: テーブル情報を取得する（table_id）
+activate table
+table --> nimmt: テーブル情報（status, players）
+deactivate table
+nimmt --> user: テーブル情報
+deactivate nimmt
 
-user -> nimmt: プレイヤー情報を取得する
-nimmt --> user: プレイヤー情報
-
-user -> nimmt: ゲーム開始
-nimmt -> nimmt: カードを 4 枚テーブルに並べる
-nimmt -->> notice: LineUpCards
-nimmt -> nimmt: ステータス：Selecting
+user -> nimmt: カードを取得する（JWT）
+activate nimmt
+nimmt --> user: カード
+deactivate nimmt
 
 == 進行フェーズ ==
 
-loop プレイヤー数
-  user -> nimmt: カードを選ぶ (数字)
-
-  alt 全員選択
-    nimmt -> nimmt: ステータス：Selected
-
-    nimmt -> nimmt: 選んだカードをテーブルに並べる
-    nimmt -->> notice: LineUpCards
-  end
-end
-
-user -> nimmt: 次のラウンドを開始する
-nimmt -> nimmt: ステータス：Selecting
-nimmt -> notice: NextRound
 
 == 得点計算 ==
 
